@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+echo "ng.sh parameters: $@"
+
+NG_SERVE_PORT=4200
+NG_IMAGE_NAME="knt/ng"
+NG_SERVE_CONTAINER_NAME="knt-ng"
+
+start_serving () {
+  echo "Serving the Angular application from: ${PWD}"
+  echo "The application will be available in http://localhost:4200"
+  echo "Please be patient, this may take a while..."
+  docker run --rm --name $NG_SERVE_CONTAINER_NAME -d -v ${PWD}:/app -p \
+    $NG_SERVE_PORT:4200 $NG_IMAGE_NAME
+}
+
+stop_serving () {
+  docker stop $NG_SERVE_CONTAINER_NAME
+}
+
+case $2 in
+  new)
+    echo "Creating a new angular app: ${PWD}/$3"
+    docker run --rm -v ${PWD}:/app $NG_IMAGE_NAME "$@"
+    ;;
+  serve)
+    if [ $3 = "stop" ]
+    then
+      stop_serving
+    else
+      start_serving
+    fi
+    ;;
+  *)
+    echo "sorry, not supported..."
+    ;;
+esac
+

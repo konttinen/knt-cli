@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+TOMCAT_PORT=8888
+TOMCAT_IMAGE_NAME="knt/tomcat:8.0"
+TOMCAT_CONTAINER_NAME="knt-tomcat"
+
+start_tomcat () {
+  echo "Starting tomcat server..."
+  docker run --rm --name $TOMCAT_CONTAINER_NAME -d -p \
+    $TOMCAT_PORT:8080 $TOMCAT_IMAGE_NAME
+}
+
+deploy () {
+  if [ $(ls | grep ".war" | wc -l) -ne 1 ]
+  then
+    echo "Cannot deploy, the directory should contain exactly one .war archive!"
+    exit 1
+  fi
+  # TODO: find the .war to deploy from the  working directory and use env
+  # variables (or smthng) to share credentials (Dockerfile, script etc...).
+
+  #curl --upload-file ${PWD}qwerty.war \
+  #  "http://tomcat-script:passukka@localhost:8888/manager/text/deploy?path=%2Fservlet-testing2&update=true"
+}
+
+stop_tomcat () {
+  docker stop $TOMCAT_CONTAINER_NAME
+}
+
+case $2 in
+  start)
+    start_tomcat
+    ;;
+  stop)
+    stop_tomcat
+    ;;
+  deploy)
+    deploy
+    ;;
+  manage)
+    docker exec -it $TOMCAT_CONTAINER_NAME /bin/bash
+    ;;
+  logs)
+    docker logs -f $TOMCAT_CONTAINER_NAME
+    ;;
+  *)
+    echo "sorry, not supported..."
+    ;;
+esac
+

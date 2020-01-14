@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+POSTGRES_IMAGE_NAME="knt/postgres:latest"
+POSTGRES_CONTAINER_NAME="knt-postgres"
+POSTGRES_PASSWORD="mysecretpassword"
+
+start_postgres () {
+  echo "Starting postgres server..."
+  docker run --rm --name $POSTGRES_CONTAINER_NAME \
+    -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD -d $POSTGRES_IMAGE_NAME
+}
+
+stop_postgres () {
+  echo "Stopping postgres server..."
+  docker stop $POSTGRES_CONTAINER_NAME
+}
+
+case $2 in
+  start)
+    start_postgres
+    ;;
+  manage)
+    docker exec -it $POSTGRES_CONTAINER_NAME /bin/bash
+    ;;
+  logs)
+    docker logs -f $POSTGRES_CONTAINER_NAME
+    ;;
+  stop)
+    stop_postgres
+    ;;
+  *)
+    echo "sorry, not supported..."
+    ;;
+esac
+

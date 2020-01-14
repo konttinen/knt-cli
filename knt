@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+WORKDIR=$(cd $(dirname $0) && pwd)
+
+$WORKDIR/plugs/$1/script "$@"
+
